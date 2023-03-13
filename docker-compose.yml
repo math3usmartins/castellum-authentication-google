@@ -1,0 +1,22 @@
+version: "2.2"
+
+services:
+    authentication:
+        build:
+            dockerfile: .docker/Dockerfile
+        user: "node"
+        working_dir: /opt/castellum/authentication
+        command: npm run build
+        volumes:
+            - ./:/opt/castellum/authentication
+
+    demo:
+        image: node:16-alpine
+        working_dir: /opt/castellum/authentication/demo
+        command: node server.js
+        environment:
+            PORT: 8080
+        ports:
+            - 8080
+        volumes:
+            - ./:/opt/castellum/authentication

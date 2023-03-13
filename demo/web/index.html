@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<script src="/jwt-decode.js"></script>
+	</head>
+	<body>
+		<h1>Castellum Google Authentication</h1>
+
+		<script
+			src="https://accounts.google.com/gsi/client"
+			async
+			defer
+		></script>
+
+		<!-- data-client_id MUST be rendered with GOOGLE_CLIENT_ID from your env  -->
+		<div
+			id="g_id_onload"
+			data-client_id="${GOOGLE_CLIENT_ID}"
+			data-callback="handleCredentialResponse"
+			data-auto_prompt="false"
+		></div>
+
+		<div
+			class="g_id_signin"
+			data-type="standard"
+			data-size="large"
+			data-theme="outline"
+			data-text="sign_in_with"
+			data-shape="rectangular"
+			data-logo_alignment="left"
+		></div>
+
+		<div id="hello"></div>
+
+		<script>
+			function handleCredentialResponse(response) {
+				const payload = jwt_decode(response.credential)
+
+				fetch("/api/signup", {
+					method: "POST",
+					body: JSON.stringify({
+						email: payload.email,
+						token: response.credential,
+					}),
+				}).then(function (response) {
+					response.json().then((data) => {
+						console.log(
+							"sign up complete. account ID = " + data.accountId,
+						)
+
+						document.getElementById("hello").innerHTML = `<p>Hello ${payload.email} -- your account ID is ${data.accountId}</p>`
+					})
+				})
+			}
+		</script>
+	</body>
+</html>
